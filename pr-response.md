@@ -42,4 +42,7 @@ Adds a **watchlist** feature to CineLog, letting users save films they want to w
 
 - **Watchlist vs. collection are separate concepts** — a film can be on a watchlist and later added to the collection, so they use independent models rather than a shared table with a status flag.
 - **UUID film IDs** — the restored `WatchlistEntry.film_id` matches `CollectionEntry.film_id` (`String(36)`) so both foreign keys reference the migrated `Film.id`.
- 
+
+
+ ![alt text](image.png)
+
