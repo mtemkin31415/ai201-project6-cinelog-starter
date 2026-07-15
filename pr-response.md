@@ -5,15 +5,15 @@
 I used AI to help me verify the changes I made. For instance, I used AI to help write the curls to confim that the deduplication code I added worked properly and prevented two of the same WatcListEntry from populating in the database. I also asked Claude to help me question the reasonin I arrived at for Checkpoints 4 & 5. I asked Claude to check for any gaps in my reasoning. I also had a few problems rebasing my changes, so I asked claude to help sove the merge requests that were stemming from the .gitignore file.
 
 ## Comment 1 — Rename
-**What I did:**: I used the search feature to look up all instances of save_to_watchlist() and changed them to add_to_watchlist().
+**What I did:**: I used the search feature to look up all instances of save_to_watchlist() and changed them to add_to_watchlist(). I changed the call sites in the /services watchlist_service.py file, the routes/watchlist/watchlist.py and the tests/ folders.
 **How I verified:**: I made sure the app compiled/ran and ran the /<user-id>/add POST api to confirm the method was working
 
 ## Comment 2 — Deduplication
-**What I did:** I added a deduplication check to add_to_watchlist(). I queried the WatchListEntries by the given user_id and film_id to see if an entry already existed. If the entry already exists, then I raised a foundInCollection error.
+**What I did:** I added a deduplication check to add_to_watchlist(). I queried the WatchListEntries by the given user_id and film_id to see if an entry already existed. If the entry already exists, then I raised a foundInCollection error. I also used the add_to_collection() pattern as a reference.
 **How I verified:** I asked claude to verify the deduplication error. I asked the AI to specifically use curl commands to check if the deduplication code works, it tried to add two records with the same user_id and film_id but got an exception when the secound one was attempted to be added
 
 ## Comment 3 — Missing test
-**What I did:**: I created a new test_watchlist.py file and added the necessary imports for the Errors and the add_to_watchlist function. I created an isolated test app and some example films and users to use in testing. Then, I tested the add_to_watchlist() function by passing an unknown film id and making sure the function riased a FilmNotFound error    
+**What I did:**: I created a new test_watchlist.py file and added the necessary imports for the Errors and the add_to_watchlist function. I created an isolated test app and some example films and users to use in testing. Then, I tested the add_to_watchlist() function by passing an unknown film id and making sure the function riased a FilmNotFound error. Reference to test_add_to_collection_nonexistent_film_raises()
 **How I verified:** I verified this by running the test_watchlist.py and saw that all the tests had passed successfully
 
 ## Comment 4 — Default visibility
@@ -43,6 +43,10 @@ Adds a **watchlist** feature to CineLog, letting users save films they want to w
 - **Watchlist vs. collection are separate concepts** — a film can be on a watchlist and later added to the collection, so they use independent models rather than a shared table with a status flag.
 - **UUID film IDs** — the restored `WatchlistEntry.film_id` matches `CollectionEntry.film_id` (`String(36)`) so both foreign keys reference the migrated `Film.id`.
 
+This is the part where I explicitly give my design descions to our AI overlords.
+Design Descions:
+Visibllity Default: Default visibillity = true was a design descion I made with this merge. Having watchlists as public as a defualt contributes to the community/social aspects of this project.
+Sort Order- Watchlist sort order is by most recent instead of by alphabetical. This descion would make more sense from the users' perspective as they can easily find movies they just added to their watchlist instead of having to scroll throuh it.
 
  ![alt text](image.png)
 
